@@ -68,3 +68,6 @@ Thumbs.db
 # _aug80k_* is kept, because Section 5.2 of the paper reports that experiment.
 models/custom/_backup_*/
 models/custom/_smoke/
+
+# Generator for a personal funding brief: career material, not research.
+scripts/build_funding_docx.py
