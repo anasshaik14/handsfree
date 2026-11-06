@@ -1,0 +1,376 @@
+{
+  "generated": "2026-07-27 16:13:11",
+  "sections": [
+    {
+      "title": "Gaze \u2014 all providers on MPIIGaze (Original)",
+      "note": "FaceMesh detected 2268/3000 faces on MPIIGaze's own evaluation subset (much of it captured in near-dark rooms, so detection confidence is lowered to 0.15; the recovered faces were checked against MPIIGaze's manually annotated eye corners and land within 3.6 px median on a 1280x720 image, so they are real detections rather than noise). Every provider is scored on those same images through the app's real front end. The three classical providers output a screen-space signal rather than an angle, so each gets the per-user calibration the app itself performs (gain + head-pose assist + centre for the geometric/pupil mappers, the full 8-term polynomial for iris_polynomial), fitted per participant on half their samples and scored on the held-out half. The custom CNN is fitted the same way, because the app does the same thing to it (gaze.custom.gain_x/gain_y plus set_center) and because its training labels live in MPIIGaze's normalised frame, not this camera frame. IMPORTANT: this table is a harness for comparing providers against each other on equal terms, and its custom column is NOT comparable to the 93.5% / 2.43\u00b0 in the regressor table above \u2014 that number scores the CNN on MPIIGaze's pre-normalised eye patches (its training domain, and the standard protocol the literature reports), whereas this one crops live from the original image via FaceMesh exactly as the running app does. The gap between the two is a genuine train/serve difference, not a scoring error.",
+      "order": [
+        "acc_within_5deg",
+        "acc_within_10deg",
+        "acc_within_15deg",
+        "mae_deg",
+        "rmse_deg",
+        "median_ae_deg",
+        "p90_ae_deg",
+        "angular_mean_deg",
+        "r2_best",
+        "r2_worst",
+        "corr_best",
+        "corr_worst"
+      ],
+      "models": {
+        "custom": {
+          "title": "custom (our CNN)",
+          "dataset": "MPIIGaze (Original)",
+          "n_samples": 1130,
+          "metrics": {
+            "mae_deg": 5.3156,
+            "rmse_deg": 6.7329,
+            "median_ae_deg": 4.4279,
+            "p90_ae_deg": 11.0086,
+            "r2_best": 0.6278,
+            "r2_worst": 0.3402,
+            "corr_best": 0.793,
+            "corr_worst": 0.5843,
+            "acc_within_5deg": 0.2513,
+            "acc_within_10deg": 0.7027,
+            "acc_within_15deg": 0.915,
+            "angular_mean_deg": 8.2365
+          }
+        },
+        "iris_geometric": {
+          "title": "iris_geometric",
+          "dataset": "MPIIGaze (Original)",
+          "n_samples": 1130,
+          "metrics": {
+            "mae_deg": 4.846,
+            "rmse_deg": 6.8468,
+            "median_ae_deg": 3.846,
+            "p90_ae_deg": 10.0537,
+            "r2_best": 0.7061,
+            "r2_worst": 0.1601,
+            "corr_best": 0.8414,
+            "corr_worst": 0.4986,
+            "acc_within_5deg": 0.3204,
+            "acc_within_10deg": 0.7664,
+            "acc_within_15deg": 0.9522,
+            "angular_mean_deg": 7.5852
+          }
+        },
+        "iris_polynomial": {
+          "title": "iris_polynomial",
+          "dataset": "MPIIGaze (Original)",
+          "n_samples": 1130,
+          "metrics": {
+            "mae_deg": 5.0733,
+            "rmse_deg": 10.6738,
+            "median_ae_deg": 3.7454,
+            "p90_ae_deg": 10.124,
+            "r2_best": -0.1265,
+            "r2_worst": -0.2426,
+            "corr_best": 0.5663,
+            "corr_worst": 0.4395,
+            "acc_within_5deg": 0.3257,
+            "acc_within_10deg": 0.7673,
+            "acc_within_15deg": 0.9469,
+            "angular_mean_deg": 7.6714
+          }
+        },
+        "pupil_classical": {
+          "title": "pupil_classical",
+          "dataset": "MPIIGaze (Original)",
+          "n_samples": 1130,
+          "metrics": {
+            "mae_deg": 6.2903,
+            "rmse_deg": 7.9018,
+            "median_ae_deg": 5.3414,
+            "p90_ae_deg": 12.7574,
+            "r2_best": 0.3954,
+            "r2_worst": 0.2504,
+            "corr_best": 0.6325,
+            "corr_worst": 0.5019,
+            "acc_within_5deg": 0.1841,
+            "acc_within_10deg": 0.5717,
+            "acc_within_15deg": 0.8602,
+            "angular_mean_deg": 9.7142
+          }
+        },
+        "mpiigaze_resnet": {
+          "title": "MPIIGaze ResNet-preact (pretrained NN)",
+          "dataset": "MPIIGaze (Normalized eye patches)",
+          "n_samples": 30000,
+          "metrics": {
+            "mae_deg": 1.818,
+            "rmse_deg": 2.5523,
+            "median_ae_deg": 1.3447,
+            "p90_ae_deg": 3.8586,
+            "r2_best": 0.8938,
+            "r2_worst": 0.8142,
+            "corr_best": 0.9455,
+            "corr_worst": 0.9045,
+            "acc_within_5deg": 0.8837,
+            "acc_within_10deg": 0.9851,
+            "acc_within_15deg": 0.9968,
+            "angular_mean_deg": 2.8352
+          }
+        }
+      }
+    },
+    {
+      "title": "Head pose \u2014 all providers on AFLW2000",
+      "note": "FaceMesh detected 1749/1969 faces; classical providers are scored on those (the CNN needs no landmarks). A per-axis constant offset was removed for the classical providers, mirroring the app's neutral-pose capture, and axis conventions were aligned to the dataset's once, globally (no per-sample fitting).",
+      "order": [
+        "acc_within_5deg",
+        "acc_within_10deg",
+        "acc_within_15deg",
+        "mae_deg",
+        "rmse_deg",
+        "median_ae_deg",
+        "p90_ae_deg",
+        "angular_mean_deg",
+        "r2_best",
+        "r2_worst",
+        "corr_best",
+        "corr_worst"
+      ],
+      "models": {
+        "custom": {
+          "title": "custom (our CNN)",
+          "dataset": "AFLW2000",
+          "n_samples": 1969,
+          "metrics": {
+            "mae_deg": 7.3666,
+            "rmse_deg": 12.1965,
+            "median_ae_deg": 4.1851,
+            "p90_ae_deg": 17.1966,
+            "r2_best": 0.8752,
+            "r2_worst": 0.5817,
+            "corr_best": 0.9375,
+            "corr_worst": 0.7944,
+            "acc_within_5deg": 0.5256,
+            "acc_within_10deg": 0.8111,
+            "acc_within_15deg": 0.901,
+            "angular_mean_deg": 11.9946
+          }
+        },
+        "solvepnp": {
+          "title": "solvepnp",
+          "dataset": "AFLW2000",
+          "n_samples": 1749,
+          "metrics": {
+            "mae_deg": 10.5104,
+            "rmse_deg": 23.7577,
+            "median_ae_deg": 3.6887,
+            "p90_ae_deg": 21.099,
+            "r2_best": 0.5573,
+            "r2_worst": -0.6164,
+            "corr_best": 0.7691,
+            "corr_worst": 0.2995,
+            "acc_within_5deg": 0.53,
+            "acc_within_10deg": 0.8016,
+            "acc_within_15deg": 0.8313,
+            "angular_mean_deg": 21.3425
+          }
+        },
+        "landmark_heuristic": {
+          "title": "landmark_heuristic",
+          "dataset": "AFLW2000",
+          "n_samples": 1749,
+          "metrics": {
+            "mae_deg": 10.491,
+            "rmse_deg": 16.1113,
+            "median_ae_deg": 5.2073,
+            "p90_ae_deg": 30.2456,
+            "r2_best": 0.7683,
+            "r2_worst": 0.2855,
+            "corr_best": 0.9519,
+            "corr_worst": 0.6506,
+            "acc_within_5deg": 0.2847,
+            "acc_within_10deg": 0.526,
+            "acc_within_15deg": 0.7536,
+            "angular_mean_deg": 21.8934
+          }
+        },
+        "6drepnet": {
+          "title": "6DRepNet (pretrained NN)",
+          "dataset": "AFLW2000",
+          "n_samples": 1969,
+          "metrics": {
+            "mae_deg": 3.4822,
+            "rmse_deg": 6.7255,
+            "median_ae_deg": 1.9188,
+            "p90_ae_deg": 7.4864,
+            "r2_best": 0.9798,
+            "r2_worst": 0.8017,
+            "corr_best": 0.9919,
+            "corr_worst": 0.897,
+            "acc_within_5deg": 0.8471,
+            "acc_within_10deg": 0.9523,
+            "acc_within_15deg": 0.9766,
+            "angular_mean_deg": 5.9314
+          }
+        }
+      }
+    },
+    {
+      "title": "Voice \u2014 engines on Speech Commands v2 (six command words)",
+      "note": "vosk runs with a limited-vocabulary grammar over the same six words (its keyword-spotting mode). Both engines are scored by the same function as the custom CNNs above. One asymmetry to note: vosk can decline to answer, and did so on 40 of 900 clips \u2014 each counts as a miss (it is scored WITH its reject option, while the CNN column is pure argmax with its 0.80 runtime confidence gate switched off, so if anything vosk is handicapped here). Per-class averages cover the six real words; accuracy counts every clip.",
+      "order": [
+        "accuracy",
+        "balanced_accuracy",
+        "error_rate",
+        "precision_macro",
+        "precision_weighted",
+        "recall_macro",
+        "recall_weighted",
+        "specificity_macro",
+        "f1_macro",
+        "f1_weighted",
+        "fhalf_macro",
+        "f2_macro",
+        "jaccard_macro",
+        "mcc",
+        "cohen_kappa",
+        "fpr_macro",
+        "fnr_macro",
+        "fdr_macro",
+        "inference_ms"
+      ],
+      "confusion": {
+        "labels": [
+          "down",
+          "go",
+          "no",
+          "stop",
+          "up",
+          "yes",
+          "unrecognized"
+        ],
+        "matrix": [
+          [
+            141,
+            2,
+            1,
+            0,
+            0,
+            0,
+            6
+          ],
+          [
+            0,
+            146,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          [
+            0,
+            0,
+            141,
+            0,
+            0,
+            0,
+            9
+          ],
+          [
+            1,
+            0,
+            0,
+            143,
+            3,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            140,
+            0,
+            10
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            142,
+            8
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "title": "Voice \u2014 vosk confusion matrix"
+      },
+      "models": {
+        "custom": {
+          "title": "custom (our CNN)",
+          "dataset": "Speech Commands v2",
+          "n_samples": 2468,
+          "metrics": {
+            "accuracy": 0.9453,
+            "balanced_accuracy": 0.9448,
+            "error_rate": 0.0547,
+            "precision_macro": 0.9453,
+            "precision_weighted": 0.9458,
+            "recall_macro": 0.9448,
+            "recall_weighted": 0.9453,
+            "specificity_macro": 0.9891,
+            "f1_macro": 0.9448,
+            "f1_weighted": 0.9453,
+            "fhalf_macro": 0.9451,
+            "f2_macro": 0.9448,
+            "jaccard_macro": 0.8972,
+            "mcc": 0.9344,
+            "cohen_kappa": 0.9344,
+            "fpr_macro": 0.0109,
+            "fnr_macro": 0.0552,
+            "fdr_macro": 0.0547,
+            "inference_ms": 2.7
+          }
+        },
+        "vosk": {
+          "title": "vosk (pretrained ASR)",
+          "dataset": "Speech Commands v2",
+          "n_samples": 900,
+          "metrics": {
+            "accuracy": 0.9478,
+            "balanced_accuracy": 0.9478,
+            "error_rate": 0.0522,
+            "precision_macro": 0.9919,
+            "precision_weighted": 0.9919,
+            "recall_macro": 0.9478,
+            "recall_weighted": 0.9478,
+            "specificity_macro": 0.9984,
+            "f1_macro": 0.9693,
+            "f1_weighted": 0.9693,
+            "fhalf_macro": 0.9827,
+            "f2_macro": 0.9563,
+            "jaccard_macro": 0.9405,
+            "mcc": 0.9392,
+            "cohen_kappa": 0.9379,
+            "fpr_macro": 0.0016,
+            "fnr_macro": 0.0522,
+            "fdr_macro": 0.0081,
+            "inference_ms": 26.5
+          }
+        }
+      }
+    }
+  ],
+  "notes": [
+    "mp_geometry (head pose) reports pose relative to a per-user neutral face cloud, so it has no absolute output to score against a dataset; see the runtime tables for its live performance.",
+    "The classical blink detectors (EAR standard/adaptive, ELA) are geometric rules over FaceMesh eye landmarks, so scoring them needs full-FACE images labelled open/closed. Every eye dataset on this machine (mrlEyes_2018_01 and both archive copies) contains cropped eye images with no surrounding face, which FaceMesh cannot process, and no full-face set here (300W-LP, AFLW2000, MPIIGaze) carries eye-state labels. They are therefore compared in the runtime tables only; a labelled face set such as CEW (Closed Eyes in the Wild) would be needed to score them against the blink CNN's MRL-Eye numbers. This gap is stated rather than filled with a proxy metric."
+  ]
+}

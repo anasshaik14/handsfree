@@ -1,0 +1,62 @@
+<!doctype html><meta charset="utf-8"><title>HandsFree — Custom vs Pretrained</title>
+<style>
+*{box-sizing:border-box} body{margin:0;background:#f9f9f7;color:#0b0b0b;
+font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:48px 24px 90px}
+h1{font-size:2.3rem;margin:0 0 6px;letter-spacing:-.01em}
+.lede{color:#52514e;font-size:1.08rem;margin:0 0 8px;max-width:760px}
+.note{background:#fff;border:1px solid #e5e8ee;border-left:3px solid #eb6834;border-radius:8px;
+padding:12px 16px;margin:22px 0 8px;color:#52514e;font-size:.92rem;max-width:900px}
+section{margin-top:56px}
+h2{font-size:1.5rem;margin:0 0 4px}
+.sub{color:#52514e;margin:0 0 6px;max-width:900px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px;margin-top:22px}
+.card{background:#fff;border:1px solid #e5e8ee;border-radius:12px;overflow:hidden}
+.card img{width:100%;display:block;border-bottom:1px solid #eef0f4}
+.cap{padding:12px 16px 16px}
+.cap b{font-size:1rem}.cap p{margin:4px 0 0;color:#52514e;font-size:.88rem}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid #e5e8ee;color:#898781;font-size:.85rem}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+<h1>Custom&nbsp;CNNs vs Pretrained&nbsp;Models</h1>
+<p class="lede">A visual, per-sample comparison across all four HandsFree inputs — no bar charts, no pie charts, no line graphs. Every model is scored on the same held-out data with the same metrics; each figure is drawn from real per-sample predictions.</p>
+<div class="note"><b>How to read the comparison honestly.</b> Gaze and head pose are true neural-net-vs-neural-net comparisons on matched samples. Voice compares the custom CNN against pretrained Vosk (summary metrics only). Blink’s alternative is a classical maths rule, not a neural net, so it is shown as a deep audit of the custom model.</div>
+<div class="note" style="border-left-color:#2a78d6"><b>Work in progress.</b> I am still refining the hyperparameter tuning for the gaze and head-pose custom models to push their accuracy further, with the goal of making them as competitive with the pretrained models as the custom blink and voice models already are.</div>
+<section><h2>Gaze  ·  custom CNN vs pretrained MPIIGaze ResNet</h2><p class="sub">Matched per-sample on the custom model's HELD-OUT participants (p05, p07) only — the full 15-participant set contains nine of its own training people and flatters it by ~1.9°. Each model gets its own preprocessing. The pretrained baseline was trained on MPIIGaze and likely saw these participants, so the comparison is conservative towards ours.</p><div class="grid">
+<div class="card"><img src="gaze/G1_error_sky.png" alt="Error sky"><div class="cap"><b>Error sky</b><p>Polar heatmap of error by gaze direction × eccentricity — custom glows brighter.</p></div></div>
+<div class="card"><img src="gaze/G2_displacement_field.png" alt="Displacement field"><div class="cap"><b>Displacement field</b><p>Arrows from true gaze to average prediction; longer = stronger systematic bias.</p></div></div>
+<div class="card"><img src="gaze/G3_tolerance_sunburst.png" alt="Tolerance sunburst"><div class="cap"><b>Tolerance sunburst</b><p>Nested rings: share of predictions within 5/10/15° for each model.</p></div></div>
+<div class="card"><img src="gaze/G4_win_skyline.png" alt="Head-to-head skyline"><div class="cap"><b>Head-to-head skyline</b><p>Every sample sorted by the per-sample error gap — who wins, and by how much.</p></div></div>
+<div class="card"><img src="gaze/G5_bland_altman.png" alt="Bland–Altman density"><div class="cap"><b>Bland–Altman density</b><p>Bias and 95% limits of agreement per axis, over a density field.</p></div></div>
+<div class="card"><img src="gaze/G6_eccentricity_ridgeline.png" alt="Error vs eccentricity"><div class="cap"><b>Error vs eccentricity</b><p>Error distribution split by how far off-centre the gaze is.</p></div></div>
+<div class="card"><img src="gaze/G7_true_vs_pred.png" alt="Predicted vs true"><div class="cap"><b>Predicted vs true</b><p>Density fit with R² for pitch and yaw.</p></div></div>
+</div></section>
+<section><h2>Head pose  ·  custom CNN vs pretrained 6DRepNet</h2><p class="sub">Matched per-sample on AFLW2000 (the standard test for 300W-LP-trained models). Same crop scored by both models — a true NN-vs-NN comparison.</p><div class="grid">
+<div class="card"><img src="headpose/H1_signed_violins.png" alt="Signed-error violins"><div class="cap"><b>Signed-error violins</b><p>Per-axis bias and spread; custom left, 6DRepNet right of each spine.</p></div></div>
+<div class="card"><img src="headpose/H2_fingerprint.png" alt="Error fingerprint"><div class="cap"><b>Error fingerprint</b><p>Heat-grid of four error measures across all three axes, per model.</p></div></div>
+<div class="card"><img src="headpose/H3_pose_heatmap.png" alt="Pose-sphere heatmap"><div class="cap"><b>Pose-sphere heatmap</b><p>Where in yaw×pitch space each model struggles.</p></div></div>
+<div class="card"><img src="headpose/H4_win_skyline.png" alt="Head-to-head skyline"><div class="cap"><b>Head-to-head skyline</b><p>Every face sorted by its error gap.</p></div></div>
+<div class="card"><img src="headpose/H5_yaw_ridgeline.png" alt="Error vs profile"><div class="cap"><b>Error vs profile</b><p>Error distribution per yaw band, frontal → full profile.</p></div></div>
+<div class="card"><img src="headpose/H6_true_vs_pred.png" alt="Predicted vs true"><div class="cap"><b>Predicted vs true</b><p>Density fit with R² for yaw, pitch, roll.</p></div></div>
+<div class="card"><img src="headpose/H7_win_map.png" alt="Pose battleground"><div class="cap"><b>Pose battleground</b><p>Each face placed by true angle, coloured by which model wins.</p></div></div>
+</div></section>
+<section><h2>Voice  ·  custom keyword CNN vs pretrained Vosk</h2><p class="sub">Custom CNN scored per-sample on the Speech Commands test split. Vosk gives a hard transcript (no probabilities), so it enters as summary metrics — the metric rose (V2) is the direct comparison; the rest are the custom model's per-sample audit.</p><div class="grid">
+<div class="card"><img src="voice/V1_confusion.png" alt="Confusion matrix"><div class="cap"><b>Confusion matrix</b><p>Row-normalised — where each spoken word's clips were sent.</p></div></div>
+<div class="card"><img src="voice/V2_metric_rose.png" alt="Metric rose (vs Vosk)"><div class="cap"><b>Metric rose (vs Vosk)</b><p>Seven summary scores as paired petals, custom vs pretrained Vosk.</p></div></div>
+<div class="card"><img src="voice/V3_constellation.png" alt="Calibration constellation"><div class="cap"><b>Calibration constellation</b><p>Confidence bins as bubbles — is the model's confidence honest?</p></div></div>
+<div class="card"><img src="voice/V4_perword_ridgeline.png" alt="Per-word confidence"><div class="cap"><b>Per-word confidence</b><p>Which keywords are easy vs hard.</p></div></div>
+<div class="card"><img src="voice/V5_separation.png" alt="Separation densities"><div class="cap"><b>Separation densities</b><p>Per-keyword: score on target word (up) vs the rest (down); AUC shown.</p></div></div>
+<div class="card"><img src="voice/V6_decision_margin.png" alt="Decision margin"><div class="cap"><b>Decision margin</b><p>Wrong answers cluster at low margins — hesitation flags mistakes.</p></div></div>
+<div class="card"><img src="voice/V7_word_flow.png" alt="Word flow"><div class="cap"><b>Word flow</b><p>Every clip streaming true→predicted; cross-overs are the confusions.</p></div></div>
+</div></section>
+<section><h2>Blink  ·  custom CNN deep-dive</h2><p class="sub">The blink alternative in the app is a classical Eye-Aspect-Ratio maths rule (not a neural net) and cannot be scored per-sample on the MRL eye-crop test set. So blink is presented as a rigorous per-sample audit of the custom CNN rather than a NN-vs-NN race.</p><div class="grid">
+<div class="card"><img src="blink/B1_swarm.png" alt="Separation swarm"><div class="cap"><b>Separation swarm</b><p>Every test eye as a dot by P(closed); the two clouds pull to opposite ends.</p></div></div>
+<div class="card"><img src="blink/B2_mosaic.png" alt="Confusion mosaic"><div class="cap"><b>Confusion mosaic</b><p>Proportional territory — column width = class prevalence, solid = correct.</p></div></div>
+<div class="card"><img src="blink/B3_constellation.png" alt="Calibration constellation"><div class="cap"><b>Calibration constellation</b><p>Confidence bins as bubbles on the honesty diagonal.</p></div></div>
+<div class="card"><img src="blink/B4_streamgraph.png" alt="Outcome streamgraph"><div class="cap"><b>Outcome streamgraph</b><p>The four outcomes trading off as the click threshold slides 0→1.</p></div></div>
+<div class="card"><img src="blink/B5_confusion_flow.png" alt="Confusion as a river"><div class="cap"><b>Confusion as a river</b><p>Samples flowing true→predicted; thin cross-ribbons are mistakes.</p></div></div>
+<div class="card"><img src="blink/B6_score_separation.png" alt="Score separation"><div class="cap"><b>Score separation</b><p>How cleanly the P(closed) score splits the two classes.</p></div></div>
+<div class="card"><img src="blink/B7_margin_ridge.png" alt="Decision certainty"><div class="cap"><b>Decision certainty</b><p>Certainty of correct vs wrong predictions — does the model hesitate on mistakes?</p></div></div>
+</div></section>
+<footer>HandsFree MSc project · 28 figures (7 per input) · generated from matched per-sample predictions in reports/tuning/pretrained/matched_*.npz</footer></div>

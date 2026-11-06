@@ -1,0 +1,42 @@
+{
+  "n_samples": 12014,
+  "mae_deg": 4.151892358557761,
+  "rmse_deg": 5.304577058409681,
+  "median_ae_deg": 3.4385746717453003,
+  "max_ae_deg": 24.446885108947754,
+  "p90_ae_deg": 8.512709879875183,
+  "p95_ae_deg": 10.284523515403265,
+  "mae_deg_pitch": 3.494095874759746,
+  "rmse_deg_pitch": 4.399007326011968,
+  "bias_deg_pitch": 2.0362139857649018,
+  "std_deg_pitch": 3.899371495315928,
+  "r2_pitch": 0.3002764608738212,
+  "corr_pitch": 0.6729102317773143,
+  "mae_deg_yaw": 4.809688842355777,
+  "rmse_deg_yaw": 6.076661096597837,
+  "bias_deg_yaw": 0.7993191548746852,
+  "std_deg_yaw": 6.0238608028038,
+  "r2_yaw": 0.5603897509063683,
+  "corr_yaw": 0.7668929698003027,
+  "angular_error_deg_mean": 6.462179660797119,
+  "angular_error_deg_median": 5.913937568664551,
+  "angular_error_deg_p90": 11.236909866333008,
+  "output_order": [
+    "pitch",
+    "yaw"
+  ],
+  "split": "test",
+  "protocol": "participant-disjoint 70/15/15 over MPIIGaze p00..p14 (normalized patch)",
+  "val_angular_deg": 5.808976650238037,
+  "hyperparameters": {
+    "opt": "adamw",
+    "lr": 0.000293,
+    "weight_decay": 8.34e-05,
+    "dropout": 0.182,
+    "width": 32,
+    "fc": 128,
+    "sched": "cosine",
+    "aug": 1,
+    "batch": 128
+  }
+}

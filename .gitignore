@@ -1,0 +1,70 @@
+# ---------------------------------------------------------------------------
+# What this file keeps out of a PUBLIC repository, and why.
+# Three of these four groups are not mine to publish.
+# ---------------------------------------------------------------------------
+
+# 1. Third-party research corpora. All four carry licences that restrict
+#    redistribution, and MPIIGaze requires registering with MPI directly.
+#    They are cited in the paper; anyone reproducing the work obtains them
+#    from the original providers.
+300W_LP_DATASET/
+AFLW2000_DATASET/
+MPIIGaze_DATASET/
+mrlEyes_2018_01_DATASET/
+speech.zip
+data/
+
+# 2. Someone else's copyrighted papers, kept locally as writing references.
+EEG PAPER(OVERALL).pdf
+RISK ADJ(MATHEMATICAL EQUATIONS).pdf
+ECHO(ALGORITHMS).pdf
+els-cas-templates.zip
+
+# 3. My own employment and academic records. Personal data, not research.
+Casual Academic Timesheet*.docx
+JD Academic Associate*.docx
+Progression_Statement.htm
+HandsFree_Project_Work.docx
+UK Research Funding Opportunities - HandsFree.docx
+
+# 4. Pre-trained models downloaded at setup time (801 MB). Redistributable,
+#    but fetched by the setup instructions rather than committed.
+models/faster-whisper-base.en/
+models/vosk-model-small-en-us-0.15/
+models/pretrained/
+models/*.tflite
+models/*.task
+
+# Superseded drafts and build intermediates of the manuscript.
+reports/*.zip
+reports/*.docx
+reports/overleaf/
+HANDSFREE AI PAPER 1.docx
+HANDSFREE AI PAPER 1.pdf
+HANDSFREE_RESULT_Q1_F.docx
+HandsFree_Results.docx
+paper1.zip
+paper1_edited.zip
+paper1_fixed.zip
+paper1_clean.zip
+paper1_orig/
+
+# Local calibration captures: gaze and face measurements of a real person.
+calibration/
+
+# Ordinary build and environment noise.
+.venv/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+logs/
+*.log
+.claude/
+Screenshot*.png
+.DS_Store
+Thumbs.db
+
+# Dated training snapshots and smoke-test artefacts: development clutter.
+# _aug80k_* is kept, because Section 5.2 of the paper reports that experiment.
+models/custom/_backup_*/
+models/custom/_smoke/

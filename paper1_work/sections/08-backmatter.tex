@@ -1,0 +1,19 @@
+\FloatBarrier
+
+\section*{Declaration of competing interest}
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\FloatBarrier
+
+\section*{Funding}
+
+This research was conducted as part of the lead author's MSc Data Science programme at York St John University and received no specific grant from any funding agency in the public, commercial or not-for-profit sectors.
+
+\FloatBarrier
+
+\section*{Data and code availability}
+
+All four corpora used in this study are publicly available and are cited in \TABREF{4}: the MRL Eye Dataset \CITE{mrl}, MPIIGaze \CITE{mpiigaze,mpiigaze_pami}, 300W-LP and AFLW2000 \CITE{w300lp,aflw}, and Google Speech Commands v2 \CITE{speechcmd}. No new data were collected, and no human participants were recruited for this work.
+
+The four trained networks are distributed as self-contained TorchScript modules \CITE{torchscript}, and the training, evaluation, hyperparameter-search and figure-generation scripts --- together with the per-trial search logs and the aligned per-sample prediction arrays underlying every figure and table in Section 5 --- are available from the corresponding author on reasonable request. The GERA audit of \ALGREF{2} requires only two prediction streams and a group label per sample, so it can be reproduced against any pair of models without access to this system's weights.

@@ -1,0 +1,102 @@
+\FloatBarrier
+
+\section{Threats to validity}
+
+We state the limitations of this study explicitly and in descending order of how much they constrain the conclusions. Several were identified by the analysis itself and are recorded here rather than in the sections that produced them.
+
+\FloatBarrier
+
+\subsection{Held-out participant count for gaze}
+
+The participant-disjoint gaze split yields \textbf{two} held-out individuals. They contribute 64,172 samples, but by the effective-sample-size relation \EQREF{10} the sample size for the cross-person question is the group count, not the row count:
+
+\begin{equation}
+\label{eq:303}
+n_{\mathrm{eff}} = n / [ 1 + (\bar{n} - 1) \rho ] \to G/\rho = 2/\rho as \bar{n} \to \infty .
+\end{equation}
+
+Their fitted gains differ substantially --- (0.586, 0.630) for p05 against (0.377, 0.430) for p07 by \EQREF{219} --- which is direct evidence that the between-participant variance component $\sigma_{b}^{2}$ in \EQREF{7} is large relative to the within-participant component, and therefore that two participants is a small sample in the sense that matters.
+
+This is a departure from established practice and should be read as such: leave-one-person-out over all fifteen participants is the standard protocol for person-independent evaluation on MPIIGaze, and it would give a substantially more robust estimate at fifteen times the compute cost. The single split was adopted under the compute constraint of Section 4.1, not because it is adequate. Two consequences follow. The gain dispersion of \FIGREF{18} should be treated as indicative rather than established, and the gaze accuracy figures throughout are point estimates from one fold whose fold-to-fold variability is unmeasured. The EDCP of \TABREF{5} is independent of this choice --- it prescribes \emph{which groups may enter a comparison}, not \emph{how many folds are run} --- so the audit contribution is unaffected, but the gaze comparison itself would be strengthened by the full leave-one-person-out treatment.
+
+\FloatBarrier
+
+\subsection{The detector has one positive case}
+
+GERA is exercised on a negative control (head pose, Section 5.1.3) and on a single positive case: one corpus, fifteen groups, six outside the audited model's training partition. The Hanley--McNeil interval \EQREF{50} on a 9-versus-6 group split is approximately
+
+\begin{equation}
+\label{eq:304}
+\mathrm{AUC}_r = 0.889 , 95 \% CI \approx [ 0.70, 1.00 ] ,
+\end{equation}
+
+so the Mann--Whitney p = 0.006 establishes that the two group sets \emph{differ}, not that the statistic separates membership at this rate elsewhere. The negative control constrains the false-positive direction; \textbf{nothing here constrains the false-negative direction}, since no case is available in which leakage is known to be present but mild. Its per-participant membership labels were reconstructed from the pipeline's group split and reproduce the strata of \TABREF{10} to within 0.13$^{\circ}$, so the AUC is indicative rather than exact.
+
+The detector's derivation does not depend on this corpus --- Proposition 2 requires only a reference model without differential familiarity --- but its calibration is not established, and no threshold on r is proposed for that reason. Replication across corpora and modalities is the necessary next step, and until it exists r should be read as a screening flag that motivates the stratified decomposition of Theorem 3, never as a substitute for it.
+
+\FloatBarrier
+
+\subsection{Compute constraints and single-seed selection}
+
+Experiments ran on a consumer laptop with 8 GB of memory under intermittent CPU contention. Search trials used bounded subsets of 10,000--20,000 samples and the gaze configuration of Section 5.2.1 was trained on 80,000 of 427,316 available samples. Where budgets differ between compared configurations this is stated; the augmentation comparison of Section 5.2.1 uses an identical evaluation set for both configurations and is unaffected.
+
+Each configuration was evaluated at \textbf{one seed}, so no variance over initialisations is available and no confidence interval on a single configuration's score can be quoted. Formally, the reported score is a single draw from the distribution over training randomness,
+
+\begin{equation}
+\label{eq:305}
+\begin{aligned}
+\hat{R}( f_{\hat{\vartheta }(\sigma )} ; \mathcal{E} ) , \sigma \;\text{fixed}, \\
+\mathrm{Var}_{\sigma} [ \cdot ] \;\text{unmeasured} ,
+\end{aligned}
+\end{equation}
+
+and differences below approximately 1 pp for classification or 0.2$^{\circ}$ for regression should not be treated as established without repetition. The \emph{paired} intervals, effect sizes and correlations of Sections 5.2--5.3 are unaffected by this, since they characterise the difference between two fixed models over a sample population rather than the variability of training --- a distinction worth making because those are the quantities on which the paper's conclusions rest.
+
+\FloatBarrier
+
+\subsection{Oracle bounds are not achievable}
+
+The affine recalibration of \EQREF{197} and the per-sample model selection of \EQREF{163} are fitted on the evaluation data and are therefore \textbf{upper bounds}. They are used only to close design questions negatively --- recalibration hurts, fusion gains little --- which is a use upper bounds support: if the best achievable version of an intervention is insufficient, every achievable version is. No positive claim rests on them.
+
+\FloatBarrier
+
+\subsection{Component accuracy is not system accuracy}
+
+Every figure in Section 5 measures a network in isolation, whereas the user experiences the composite $\Delta_{m}$ $\circ$ $f_{m}$ of \EQREF{1}. Three specific gaps follow.
+
+The deployed gaze path fits a per-user polynomial calibration downstream by \EQREF{106}--\EQREF{107}, so 6.439$^{\circ}$ bounds the \emph{uncalibrated} network rather than the cursor; the composed quantity is the residual scatter after the affine map, which this evaluation does not measure.
+
+The dwell-averaging argument of \EQREF{230}--\EQREF{231} assumes consecutive-frame errors are less than perfectly correlated, and the run-integrity argument of \EQREF{277}--\EQREF{279} makes the same assumption. Neither is tested here. Both depend on the AR(1) persistence $\varrho$ of \EQREF{123}, which is not identifiable from a per-frame corpus of independent crops and requires a live session to measure. Explicitly, the two conclusions hold for any $\varrho$ < 1 in \emph{direction} but their \emph{magnitudes} scale as
+
+\begin{equation}
+\label{eq:306}
+n_{\mathrm{eff}}^{\mathrm{run}} = n_{\mathrm{run}} ( 1 - \varrho ) / ( 1 + \varrho ) ,
+\end{equation}
+
+so at $\varrho$ = 0.8 the effective run length falls from 13 to 1.4 frames and the false-positive suppression of \EQREF{277} weakens from 10$^{-15}$ to approximately 10$^{-2}$. This does not reverse the recommendation of Section 5.5 --- the false-negative asymmetry weakens in the same proportion --- but it materially changes the safety margin, and it is the single measurement that would most improve confidence in the deployed thresholds.
+
+End-to-end measurement --- cursor error after calibration, click precision and recall in live sessions, gesture false-trigger rate --- is the necessary next experiment, and no claim about deployed performance should be read into the component figures until it is done.
+
+\FloatBarrier
+
+\subsection{Latency measurement}
+
+Voice latencies come from one benchmark run over a 900-clip subset for the ASR baseline and the full test set for the proposed network. A separate full-test-set profiling run recorded 84.0 ms for the baseline; the conservative 26.5 ms figure is reported, so the stated 9.8$\times$ advantage is a \textbf{lower bound}. No per-sample baseline predictions were retained, so paired significance testing between the two voice systems was not possible and none is claimed.
+
+\FloatBarrier
+
+\subsection{Unscored providers}
+
+The geometric eye-aspect-ratio blink detector cannot be evaluated on the available corpora, which contain cropped eye regions without surrounding landmarks. No comparison is reported rather than an estimated one. This leaves the blink modality without any external reference point, which is why Section 5.5 is framed as a threshold-setting audit rather than as a comparison.
+
+\FloatBarrier
+
+\subsection{Deployment gap}
+
+All accuracies are measured on curated corpora. Live operation introduces face-detection failures, illumination extremes and eyewear that these corpora under-represent --- and \FIGREF{53} identifies eyewear specifically as falling in the harder open-eye class by \EQREF{281}. Section 5.2.1 quantifies and partially removes one instance of this shift via the analytic augmentation family \EQREF{34}; the attribution evidence of Figs. 15, 30, 45 and 60 bounds the risk by establishing that the networks attend to anatomically and acoustically appropriate regions; neither eliminates it.
+
+\FloatBarrier
+
+\subsection{Generality of the framework}
+
+MAPLE is demonstrated on four modalities within one system. The formal results --- Theorem 1, Proposition 2, Corollary 1, Theorem 3 --- depend only on the existence of a grouping key, within-group dependence, and a reference model without differential familiarity, and are therefore not specific to vision or to this domain. But the \emph{empirical} calibration of the detector, the choice of B = 1,000 bootstrap replicates, the reading of spread magnitude in preference to Q, and the sufficiency of a single reference model are all established on one comparison. Whether GERA behaves as well on text, tabular or time-series comparisons --- where group structure is often weaker and the reference-model requirement harder to satisfy --- is untested.

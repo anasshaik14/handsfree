@@ -1,0 +1,285 @@
+{
+  "generated": "2026-07-15 02:25:22",
+  "headline": {
+    "blink": {
+      "title": "Blink",
+      "accuracy": 0.9817,
+      "kind": "classification accuracy"
+    },
+    "voice": {
+      "title": "Voice",
+      "accuracy": 0.9196,
+      "kind": "classification accuracy"
+    },
+    "gaze": {
+      "title": "Gaze",
+      "accuracy": 0.9348,
+      "kind": "PCK accuracy (within 5\u00b0)"
+    },
+    "headpose": {
+      "title": "Head pose",
+      "accuracy": 0.8766,
+      "kind": "PCK accuracy (within 15\u00b0)"
+    }
+  },
+  "cls": {
+    "order": [
+      "accuracy",
+      "balanced_accuracy",
+      "error_rate",
+      "precision_macro",
+      "precision_weighted",
+      "recall_macro",
+      "recall_weighted",
+      "specificity_macro",
+      "f1_macro",
+      "f1_weighted",
+      "fhalf_macro",
+      "f2_macro",
+      "jaccard_macro",
+      "mcc",
+      "cohen_kappa",
+      "fpr_macro",
+      "fnr_macro",
+      "fdr_macro"
+    ],
+    "labels": {
+      "accuracy": [
+        "Accuracy",
+        "higher is better"
+      ],
+      "balanced_accuracy": [
+        "Balanced accuracy",
+        "per-class mean recall"
+      ],
+      "error_rate": [
+        "Error rate",
+        "lower is better"
+      ],
+      "precision_macro": [
+        "Precision (macro)",
+        "higher is better"
+      ],
+      "precision_weighted": [
+        "Precision (weighted)",
+        "support-weighted"
+      ],
+      "recall_macro": [
+        "Recall / Sensitivity (macro)",
+        "higher is better"
+      ],
+      "recall_weighted": [
+        "Recall (weighted)",
+        "support-weighted"
+      ],
+      "specificity_macro": [
+        "Specificity / TNR (macro)",
+        "higher is better"
+      ],
+      "f1_macro": [
+        "F1-score (macro)",
+        "higher is better"
+      ],
+      "f1_weighted": [
+        "F1-score (weighted)",
+        "support-weighted"
+      ],
+      "fhalf_macro": [
+        "F0.5-score (macro)",
+        "precision-weighted"
+      ],
+      "f2_macro": [
+        "F2-score (macro)",
+        "recall-weighted"
+      ],
+      "jaccard_macro": [
+        "Jaccard / IoU (macro)",
+        "higher is better"
+      ],
+      "mcc": [
+        "Matthews corr. (MCC)",
+        "-1..1, higher"
+      ],
+      "cohen_kappa": [
+        "Cohen's kappa",
+        "chance-adjusted"
+      ],
+      "fpr_macro": [
+        "False-positive rate (macro)",
+        "lower is better"
+      ],
+      "fnr_macro": [
+        "False-negative rate (macro)",
+        "lower is better"
+      ],
+      "fdr_macro": [
+        "False-discovery rate (macro)",
+        "lower is better"
+      ]
+    },
+    "models": {
+      "blink": {
+        "title": "Blink",
+        "classes": "2 \u2014 open / closed",
+        "dataset": "MRL Eye",
+        "n_samples": 16979,
+        "metrics": {
+          "accuracy": 0.9817,
+          "balanced_accuracy": 0.9817,
+          "error_rate": 0.0183,
+          "precision_macro": 0.9817,
+          "precision_weighted": 0.9817,
+          "recall_macro": 0.9817,
+          "recall_weighted": 0.9817,
+          "specificity_macro": 0.9817,
+          "f1_macro": 0.9817,
+          "f1_weighted": 0.9817,
+          "fhalf_macro": 0.9817,
+          "f2_macro": 0.9817,
+          "jaccard_macro": 0.964,
+          "mcc": 0.9634,
+          "cohen_kappa": 0.9634,
+          "fpr_macro": 0.0183,
+          "fnr_macro": 0.0183,
+          "fdr_macro": 0.0183
+        }
+      },
+      "voice": {
+        "title": "Voice",
+        "classes": "6 \u2014 command words",
+        "dataset": "Speech Commands v2",
+        "n_samples": 2252,
+        "metrics": {
+          "accuracy": 0.9196,
+          "balanced_accuracy": 0.9207,
+          "error_rate": 0.0804,
+          "precision_macro": 0.9203,
+          "precision_weighted": 0.9197,
+          "recall_macro": 0.9207,
+          "recall_weighted": 0.9196,
+          "specificity_macro": 0.9839,
+          "f1_macro": 0.9204,
+          "f1_weighted": 0.9196,
+          "fhalf_macro": 0.9203,
+          "f2_macro": 0.9205,
+          "jaccard_macro": 0.8548,
+          "mcc": 0.9035,
+          "cohen_kappa": 0.9035,
+          "fpr_macro": 0.0161,
+          "fnr_macro": 0.0793,
+          "fdr_macro": 0.0797
+        }
+      }
+    }
+  },
+  "reg": {
+    "order": [
+      "acc_within_5deg",
+      "acc_within_10deg",
+      "acc_within_15deg",
+      "mae_deg",
+      "rmse_deg",
+      "median_ae_deg",
+      "p90_ae_deg",
+      "angular_mean_deg",
+      "r2_best",
+      "r2_worst",
+      "corr_best",
+      "corr_worst"
+    ],
+    "labels": {
+      "acc_within_5deg": [
+        "Accuracy within 5\u00b0",
+        "PCK, higher is better"
+      ],
+      "acc_within_10deg": [
+        "Accuracy within 10\u00b0",
+        "PCK, higher is better"
+      ],
+      "acc_within_15deg": [
+        "Accuracy within 15\u00b0",
+        "PCK, higher is better"
+      ],
+      "mae_deg": [
+        "Mean abs error (\u00b0)",
+        "lower is better"
+      ],
+      "rmse_deg": [
+        "RMSE (\u00b0)",
+        "lower is better"
+      ],
+      "median_ae_deg": [
+        "Median abs error (\u00b0)",
+        "lower is better"
+      ],
+      "p90_ae_deg": [
+        "P90 abs error (\u00b0)",
+        "lower is better"
+      ],
+      "angular_mean_deg": [
+        "Mean angular error (\u00b0)",
+        "3D gaze vector"
+      ],
+      "r2_best": [
+        "R\u00b2 (best axis)",
+        "higher is better"
+      ],
+      "r2_worst": [
+        "R\u00b2 (worst axis)",
+        "higher is better"
+      ],
+      "corr_best": [
+        "Correlation (best axis)",
+        "higher is better"
+      ],
+      "corr_worst": [
+        "Correlation (worst axis)",
+        "higher is better"
+      ]
+    },
+    "models": {
+      "gaze": {
+        "title": "Gaze",
+        "dataset": "MPIIGaze",
+        "n_samples": 7789,
+        "metrics": {
+          "mae_deg": 1.5623,
+          "rmse_deg": 2.1282,
+          "median_ae_deg": 1.2128,
+          "p90_ae_deg": 3.2539,
+          "r2_best": 0.9338,
+          "r2_worst": 0.8529,
+          "corr_best": 0.9674,
+          "corr_worst": 0.9238,
+          "acc_within_5deg": 0.9348,
+          "acc_within_10deg": 0.9946,
+          "acc_within_15deg": 0.999,
+          "angular_mean_deg": 2.4314
+        },
+        "headline_key": "acc_within_5deg",
+        "headline_note": "within 5\u00b0"
+      },
+      "headpose": {
+        "title": "Head pose",
+        "dataset": "AFLW2000",
+        "n_samples": 1969,
+        "metrics": {
+          "mae_deg": 8.4882,
+          "rmse_deg": 13.5479,
+          "median_ae_deg": 5.0971,
+          "p90_ae_deg": 19.5152,
+          "r2_best": 0.8372,
+          "r2_worst": 0.5063,
+          "corr_best": 0.9159,
+          "corr_worst": 0.7337,
+          "acc_within_5deg": 0.4276,
+          "acc_within_10deg": 0.7567,
+          "acc_within_15deg": 0.8766,
+          "angular_mean_deg": 13.7775
+        },
+        "headline_key": "acc_within_15deg",
+        "headline_note": "within 15\u00b0"
+      }
+    }
+  }
+}

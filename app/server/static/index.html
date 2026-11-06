@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HANDSFREE // OCULAR COMMAND</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="boot-flash" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header>
+  <div class="brand">
+    <svg id="eye-logo" viewBox="0 0 64 40" aria-hidden="true">
+      <path class="eye-lid" d="M2 20 Q32 -6 62 20 Q32 46 2 20 Z"/>
+      <g class="eye-ball">
+        <circle class="eye-iris" cx="32" cy="20" r="10"/>
+        <circle class="eye-pupil" cx="32" cy="20" r="4.5"/>
+        <circle class="eye-glint" cx="35.5" cy="16.5" r="1.8"/>
+      </g>
+      <path class="eye-blink" d="M2 20 Q32 -6 62 20 Q32 46 2 20 Z"/>
+    </svg>
+    <div class="brand-text">
+      <b>HANDSFREE</b>
+      <span>OCULAR&nbsp;COMMAND&nbsp;CONSOLE</span>
+    </div>
+  </div>
+
+  <div class="chips">
+    <span class="chip" id="chip-camera">camera</span>
+    <span class="chip" id="chip-face">face</span>
+    <span class="chip" id="chip-fps">– fps</span>
+    <span class="chip" id="chip-cpu">– % cpu</span>
+    <span class="chip" id="chip-conn">connecting…</span>
+  </div>
+
+  <div class="header-actions">
+    <span class="mission-clock" id="mission-clock">T+00:00</span>
+    <button id="btn-pause" class="btn warn">PAUSE CONTROL</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ 01 · live optical feed ============ -->
+  <section class="card video-card" style="--i:0">
+    <span class="panel-tag">01</span>
+    <h2>LIVE OPTICAL FEED</h2>
+    <span class="side-label" aria-hidden="true">OPTICAL&nbsp;·&nbsp;SENSOR&nbsp;·&nbsp;ARRAY</span>
+    <div class="video-wrap">
+      <img id="preview" src="/preview.mjpg" alt="camera preview">
+      <i class="vf-corner tl" aria-hidden="true"></i>
+      <i class="vf-corner tr" aria-hidden="true"></i>
+      <i class="vf-corner bl" aria-hidden="true"></i>
+      <i class="vf-corner br" aria-hidden="true"></i>
+      <span class="vf-tally" aria-hidden="true"><i></i>LIVE</span>
+      <span class="vf-scan" aria-hidden="true"></span>
+      <div id="no-cam" class="overlay-msg hidden">NO SIGNAL — camera unavailable</div>
+    </div>
+    <div class="row">
+      <button id="btn-calibrate" class="btn">QUICK · 9-PT</button>
+      <button id="btn-center" class="btn">SET CENTER</button>
+      <button id="btn-neutral" class="btn">SET NEUTRAL</button>
+    </div>
+    <div class="row">
+      <button id="btn-calibrate-hd" class="btn primary">PRECISION CALIBRATE</button>
+      <select id="sel-calib-points" title="calibration density">
+        <option value="16" selected>16 points</option>
+        <option value="25">25 points</option>
+        <option value="36">36 points</option>
+      </select>
+    </div>
+    <div class="row muted" id="calib-info">not calibrated</div>
+  </section>
+
+  <!-- ============ modality instrument stack ============ -->
+  <section class="modalities">
+
+    <div class="card" id="card-gaze" style="--i:1">
+      <span class="panel-tag">02</span>
+      <div class="card-head">
+        <h2>EYE CURSOR</h2>
+        <label class="switch"><input type="checkbox" id="tgl-gaze" checked><i></i></label>
+      </div>
+      <label class="field">TRACKING MODEL
+        <select id="sel-gaze"></select>
+      </label>
+      <div class="readout" id="ro-gaze">–</div>
+      <details><summary>calibration trim</summary>
+        <label class="slider">Smoothness <span id="v-mincutoff"></span>
+          <input type="range" id="sl-mincutoff" data-path="gaze.smoothing.mincutoff"
+                 min="0.1" max="2" step="0.05"></label>
+        <label class="slider">Responsiveness <span id="v-beta"></span>
+          <input type="range" id="sl-beta" data-path="gaze.smoothing.beta"
+                 min="0" max="0.02" step="0.0005"></label>
+        <label class="slider">Deadzone px <span id="v-deadzone"></span>
+          <input type="range" id="sl-deadzone" data-path="gaze.smoothing.deadzone_px"
+                 min="0" max="30" step="1"></label>
+        <label class="slider">Reach (corners) <span id="v-expand"></span>
+          <input type="range" id="sl-expand" data-path="gaze.expand"
+                 min="1" max="1.6" step="0.05"></label>
+        <label class="slider">Gain X <span id="v-gainx"></span>
+          <input type="range" id="sl-gainx" data-path="gaze.gain_x"
+                 min="0.5" max="6" step="0.1"></label>
+        <label class="slider">Gain Y <span id="v-gainy"></span>
+          <input type="range" id="sl-gainy" data-path="gaze.gain_y"
+                 min="0.5" max="7" step="0.1"></label>
+        <label class="slider">Head assist <span id="v-poseassist"></span>
+          <input type="range" id="sl-poseassist" data-path="gaze.pose_assist"
+                 min="0" max="1" step="0.05"></label>
+      </details>
+    </div>
+
+    <div class="card" id="card-blink" style="--i:2">
+      <span class="panel-tag">03</span>
+      <div class="card-head">
+        <h2>BLINK CLICKS</h2>
+        <label class="switch"><input type="checkbox" id="tgl-blink" checked><i></i></label>
+      </div>
+      <label class="field">DETECTOR
+        <select id="sel-blink"></select>
+      </label>
+      <div class="blink-bars">
+        <div class="bar"><i id="bar-left"></i><b id="thr-left"></b></div>
+        <div class="bar"><i id="bar-right"></i><b id="thr-right"></b></div>
+      </div>
+      <div class="hold-ring"><div id="hold-fill"></div><span id="hold-label">open</span></div>
+      <div class="readout" id="ro-blink">–</div>
+      <details><summary>calibration trim</summary>
+        <label class="slider">Click hold ms <span id="v-holdclick"></span>
+          <input type="range" id="sl-holdclick" data-path="blink.hold_click_ms"
+                 min="250" max="900" step="10"></label>
+        <label class="slider">Adaptive ratio <span id="v-adratio"></span>
+          <input type="range" id="sl-adratio" data-path="blink.adaptive_ratio"
+                 min="0.4" max="0.9" step="0.01"></label>
+      </details>
+    </div>
+
+    <div class="card" id="card-head" style="--i:3">
+      <span class="panel-tag">04</span>
+      <div class="card-head">
+        <h2>HEAD GESTURES</h2>
+        <label class="switch"><input type="checkbox" id="tgl-headpose" checked><i></i></label>
+      </div>
+      <label class="field">POSE MODEL
+        <select id="sel-headpose"></select>
+      </label>
+      <div class="pose-viz">
+        <div class="pose-axis">yaw <div class="gauge"><i id="g-yaw"></i></div><span id="t-yaw">0°</span></div>
+        <div class="pose-axis">pitch <div class="gauge"><i id="g-pitch"></i></div><span id="t-pitch">0°</span></div>
+      </div>
+      <label class="field">MAPPING
+        <select id="sel-mapping">
+          <option value="apps_lr">← → apps, ↑ ↓ tabs</option>
+          <option value="tabs_lr">← → tabs, ↑ ↓ apps</option>
+        </select>
+      </label>
+      <div class="readout" id="ro-head">–</div>
+      <details><summary>calibration trim</summary>
+        <label class="slider">Yaw threshold ° <span id="v-yawon"></span>
+          <input type="range" id="sl-yawon" data-path="headpose.yaw_on_deg"
+                 min="8" max="35" step="1"></label>
+        <label class="slider">Pitch threshold ° <span id="v-pitchon"></span>
+          <input type="range" id="sl-pitchon" data-path="headpose.pitch_on_deg"
+                 min="6" max="30" step="1"></label>
+        <label class="slider">Dwell ms <span id="v-dwell"></span>
+          <input type="range" id="sl-dwell" data-path="headpose.dwell_ms"
+                 min="100" max="800" step="20"></label>
+        <label class="slider">Cooldown ms <span id="v-cooldown"></span>
+          <input type="range" id="sl-cooldown" data-path="headpose.cooldown_ms"
+                 min="300" max="2000" step="50"></label>
+      </details>
+    </div>
+
+    <div class="card" id="card-voice" style="--i:4">
+      <span class="panel-tag">05</span>
+      <div class="card-head">
+        <h2>VOICE ASSISTANT</h2>
+        <label class="switch"><input type="checkbox" id="tgl-voice" checked><i></i></label>
+      </div>
+      <label class="field">ENGINE
+        <select id="sel-voice"></select>
+      </label>
+      <div class="voice-live">
+        <span class="voice-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <div id="voice-partial" class="muted"></div>
+        <div id="voice-final">say “help” for commands</div>
+        <div id="voice-reply" class="reply"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="tgl-tts" checked> Speak replies</label>
+      <div class="readout" id="ro-voice">–</div>
+    </div>
+  </section>
+
+  <!-- ============ 06 · telemetry rack ============ -->
+  <section class="card metrics-card" style="--i:5">
+    <span class="panel-tag">06</span>
+    <div class="card-head">
+      <h2>TELEMETRY</h2>
+      <div class="row-tight">
+        <button id="btn-session" class="btn">NEW SESSION</button>
+        <button id="btn-report" class="btn primary">GENERATE REPORT</button>
+      </div>
+    </div>
+    <div class="charts">
+      <div class="chart"><canvas id="ch-fps" width="260" height="70"></canvas><label>FRAMES / SEC</label></div>
+      <div class="chart"><canvas id="ch-lat" width="260" height="70"></canvas><label>PIPELINE MS</label></div>
+      <div class="chart"><canvas id="ch-jit" width="260" height="70"></canvas><label>JITTER PX</label></div>
+      <div class="chart"><canvas id="ch-cpu" width="260" height="70"></canvas><label>CPU %</label></div>
+    </div>
+    <div class="stage-table" id="stage-table"></div>
+  </section>
+
+  <!-- ============ 07 · event terminal ============ -->
+  <section class="card log-card" style="--i:6">
+    <span class="panel-tag">07</span>
+    <h2>EVENT TERMINAL<i class="term-cursor" aria-hidden="true"></i></h2>
+    <ul id="event-log"></ul>
+  </section>
+</main>
+
+<footer class="credit" aria-label="credits">
+  <i class="credit-dot" aria-hidden="true"></i>
+  <div>
+    <b>MOHAMMED ANAS SHAIK</b>
+    <span>York St John University</span>
+  </div>
+</footer>
+
+<div id="toasts"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

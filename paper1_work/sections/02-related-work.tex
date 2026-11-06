@@ -1,0 +1,150 @@
+\FloatBarrier
+
+\section{Related work}
+
+Hands-free interaction, evaluation integrity and efficient inference have largely separate literatures, and the framework proposed here sits at their intersection. This section reviews each along the dimension that corresponds to one of the three obstacles of Section 1: perception modalities and their cross-subject generalisation behaviour (Section 2.1), evaluation integrity and the leakage taxonomies (Section 2.2), and efficiency and interpretability for deployed perception (Section 2.3). Section 2.4 draws the cross-challenge synthesis and states the gaps that motivate MAPLE.
+
+Throughout, we adopt the convention that a \emph{challenge} is numbered as in Section 1: \textbf{C1} evaluation integrity under group structure and cross-model comparison, \textbf{C2} concurrent real-time operation within a commodity CPU budget, \textbf{C3} mechanistic interpretability tied to the deployed decision rule.
+
+\FloatBarrier
+
+\subsection{Perception modalities for hands-free interaction (C2, C3)}
+
+\subsubsection{Appearance-based gaze estimation}
+
+Gaze estimation for interaction \CITE{majaranta} divides into model-based methods, which fit a geometric eye model and recover the optical axis \CITE{morimoto}, and appearance-based methods, which regress gaze direction directly from image intensities. Model-based approaches are accurate under controlled illumination and with high-resolution imagery, but degrade sharply on the consumer webcams that a deployable assistive system must assume. Appearance-based estimation on MPIIGaze established the modern benchmark \CITE{mpiigaze,mpiigaze_pami}: the corpus provides 213,659 images from fifteen participants captured over months of everyday laptop use, and the accompanying normalisation procedure --- warping each eye patch to a canonical pose and scale --- is what makes cross-participant learning tractable at all. Reported person-independent angular errors on MPIIGaze under leave-one-person-out evaluation have improved from roughly 6$^{\circ}$ for early convolutional regressors to under 4$^{\circ}$ for residual architectures \CITE{resnet,preact} with head-pose conditioning.
+
+Two properties of this literature matter for the present work. First, the standard protocol is leave-one-person-out over all fifteen participants, which is the correct group-disjoint design; deviations from it --- including the single group-disjoint split adopted here under compute constraint --- weaken the cross-person estimate and must be declared. Second, and more consequentially for Section 3.5, the strongest publicly available MPIIGaze baselines are trained on all fifteen participants. Any comparison of a newly trained network against such a baseline, evaluated on a sample drawn from those fifteen, is asymmetrically exposed by construction: the baseline has seen every evaluation group and the proposed network has not.
+
+A second and largely separate concern is the gap between the normalised patches on which appearance-based estimators are trained and the landmark-cropped regions a live pipeline delivers. This is a deterministic covariate shift rather than sampling noise, and Section 5.2 quantifies it and shows that domain-targeted augmentation removes part of it.
+
+\subsubsection{Blink detection and intentional-blink interfaces}
+
+Blink detection for interaction faces a problem absent from blink detection for drowsiness monitoring: the interface must distinguish a \emph{deliberate} closure, intended as a click, from the involuntary blinks that occur roughly fifteen to twenty times per minute. The dominant geometric approach computes an eye-aspect ratio from six landmarks per eye and thresholds it \CITE{ear}, which is inexpensive and requires no training but presumes reliable full-face landmarking and is sensitive to eyewear, illumination and head pose. Learned alternatives operate on cropped eye regions and are correspondingly robust to the landmarking failures that break the geometric rule, at the cost of requiring a labelled corpus. The MRL Eye Dataset \CITE{mrl}, roughly 85,000 infrared and greyscale eye crops from 37 subjects annotated for open/closed state along with glasses, illumination and sensor attributes, is the standard resource.
+
+The interface-level literature converges on duration coding: a closure sustained past a threshold selects an action, with distinct thresholds for left click, right click and double click, and a refractory period preventing repeat fires. This construction has an evaluation consequence that Section 5.5 develops at length and that we have not seen stated in the blink-detection literature: because a click requires a run of consecutive above-threshold frames, an isolated per-frame false positive cannot fire one, whereas a per-frame false negative breaks a run in progress and silently cancels a deliberate click. The frame-level cost asymmetry that the confusion matrix suggests is therefore inverted by the decision rule, and the accuracy-optimal threshold is also the run-integrity-optimal threshold.
+
+\subsubsection{Head-pose estimation and gesture triggering}
+
+Head-pose estimation from a single image is posed either as landmark-plus-PnP --- solve a perspective-n-point problem against a canonical 3D face model --- or as direct regression of Euler angles \CITE{ruiz} or a continuous rotation representation \CITE{rot6d}. The landmark route inherits the landmark detector's failure modes and suffers a well-known sign ambiguity in yaw under weak perspective; the direct route requires a corpus spanning the pose manifold. 300W-LP \CITE{w300lp}, which synthesises large-pose views from 300-W faces via a 3D morphable model, and AFLW2000 \CITE{aflw}, its untouched 2,000-image companion, form the standard train/test pairing, and this pairing is disjoint by construction --- a property that Section 3.5 exploits as a negative control for the leakage detector, since it guarantees that neither a proposed network nor a pretrained baseline trained on 300W-LP has seen an AFLW2000 identity.
+
+The strongest current methods parameterise rotation continuously rather than as Euler angles \CITE{sixdrep,rot6d}, avoiding the discontinuity that Euler representations introduce and that harms gradient-based learning near gimbal configurations. Reported mean absolute errors on AFLW2000 have fallen below 4$^{\circ}$ for large networks. As with gaze, the interface consumes not the estimate but a thresholded state machine over it, and the relevant statistic is consequently per-axis \emph{bias} --- which survives dwell averaging --- rather than variance, which does not.
+
+\subsubsection{Small-footprint keyword spotting}
+
+Keyword spotting for command interfaces is the one modality where compact purpose-built models are already the norm rather than the exception, because the task is a closed-vocabulary classification over one-second clips rather than open transcription. Google Speech Commands v2 \CITE{speechcmd}, comprising 105,829 utterances of 35 words from 2,618 speakers with an official speaker-disjoint train/validation/test partition, is the standard benchmark. Convolutional classifiers over log-mel spectrograms \CITE{mfcc,sainath} reach competitive accuracy at parameter counts three orders of magnitude below general-purpose automatic speech recognition engines.
+
+The comparison against a general ASR engine \CITE{vosk,kaldi} is not like-for-like in a way that matters for interface design and that Section 5.4 quantifies. A production ASR engine equipped with a rejection option converts would-be substitutions into non-responses, which macro-averaged F1 rewards --- abstention costs recall but protects precision --- whereas a forced-choice classifier must emit a hypothesis for every input. In an interface, a substitution executes an unintended command while an abstention costs one repetition, so the two error types are not interchangeable and the fair comparison is a risk--coverage curve rather than a single accuracy figure.
+
+\subsubsection{Cross-subject generalisation: a common pattern}
+
+Across all four modalities the same quantitative pattern recurs and is well documented in the adjacent physiological-signal literature \CITE{lotte}: within-subject or randomly partitioned evaluation reports accuracy in a high band, while subject-independent protocols --- leave-one-subject-out, leave-one-person-out, or any group-disjoint split --- yield materially lower figures, with degradations of ten to twenty percentage points routinely reported. The degradation reflects genuine inter-individual variability in anatomy, appearance and expression dynamics rather than a defect of the stricter protocol. For an assistive interface intended for a user the system has never seen, the subject-independent figure is the only deployment-relevant one, and \TABREF{1} accordingly records the grouping key for every corpus used in this work.
+
+\FloatBarrier
+
+\subsection{Evaluation integrity and data leakage (C1)}
+
+\subsubsection{Leakage taxonomies and per-pipeline auditing}
+
+Leakage --- the presence in the training data of information about the evaluation target that will be unavailable at deployment --- is a mature topic with an established formulation and a well-known catalogue of instances \CITE{leakage,kohavi}. The canonical treatment \CITE{leakage} distinguishes leakage in feature construction from leakage in the training-set design, and identifies the case relevant here as arising from non-independent records: when observations are grouped and the grouping is ignored by the partitioning strategy, the split does not match the deployment boundary. Subsequent surveys have catalogued the resulting reproducibility failures across many scientific fields, enumerating eight types organised by where in a single pipeline the contamination enters \CITE{kapoor}, and a complementary quantitative landscape organises the same phenomena into four causal classes \CITE{leaktypes}.
+
+Both taxonomies share a structural property that is decisive for this paper: they are organised \emph{per pipeline}. Every type they enumerate is a relation between one model's training data and its own evaluation data, and every audit they prescribe operates on one pipeline at a time. Neither contains a category for a fault whose two terms live in different pipelines, and one of the two explicitly identifies the possibility of pathways outside its enumerated classes. Section 3.5 argues that asymmetric exposure between compared models is exactly such a pathway, and that it is undetectable by the audits these taxonomies prescribe, since neither pipeline carries any representation of the other model's partition boundary.
+
+\subsubsection{Contamination, foundation models and asymmetric exposure}
+
+The phenomenon this paper formalises has been observed, though not under this name and not in this domain. In time-series forecasting, models pretrained on large public corpora are routinely benchmarked on datasets those corpora contain, and a controlled study \CITE{tsfm} measures 47 \%--184 \% lower error for exposed models against unexposed competitors --- the same direction as, and a larger magnitude than, the effect we report. The parallel literature on benchmark contamination in language models addresses the same underlying failure from the corpus side, and provides a black-box statistical test with a false-positive guarantee based on the exchangeability of benchmark example ordering \CITE{oren}.
+
+The remedies these literatures propose require what an auditor usually lacks. Lineage analysis --- tracing which datasets entered each model's pretraining --- presumes that lineage is documented and truthful. Contamination search presumes access to the pretraining corpus. Both are unavailable when auditing a published comparison against a third-party pretrained model whose training partition is undocumented and whose corpus is not distributed, which is the ordinary case in applied computer vision and the case the present work addresses. The contribution here is therefore not to identify the hazard but to make it \emph{auditable} under the access constraints an external auditor actually faces.
+
+\subsubsection{Membership inference and difficulty calibration}
+
+The mechanism GERA repurposes originates in the privacy literature. Membership inference attacks \CITE{shokri} determine whether a particular record was in a model's training set, and the earliest formulations suffer a systematic bias: intrinsically easy or over-represented records produce low loss regardless of membership, inflating false positives. The standard correction \CITE{watson} calibrates a per-example membership score by the discrepancy between the target model and a \emph{reference} model trained without the record, so that intrinsic difficulty is priced out and only the membership-attributable component remains.
+
+GERA applies that same calibration at \emph{group} rather than example level, and repurposes it from attacking a model's privacy to auditing a comparison's validity. The shift in granularity is what makes it practical for the present problem: group-level means are stable where per-example scores are noisy, group labels are published with most corpora, and the quantity of interest --- whether a \emph{stratum} was seen --- is a group property rather than an example property. Section 3.5.3 develops the statistic and Proposition 2 states the condition under which the intrinsic difficulty term cancels exactly.
+
+\TABREF{1} summarises the leakage-relevant literature along the axes that matter for an external audit: what access each method requires, what it detects, and whether it operates within or across pipelines.
+
+\begin{table}[pos=htbp]
+\centering
+\caption{Leakage detection and mitigation approaches, compared by the access each requires and the scope at which it operates. ``Cross-pipeline'' indicates whether the method can detect a fault whose two terms lie in different models' pipelines.}
+\label{tab:1}
+\footnotesize
+\begin{tabularx}{\textwidth}{XXXXXX}
+\toprule
+\textbf{Approach} & \textbf{Access required} & \textbf{Detects} & \textbf{Scope} & \textbf{Cross-pipeline} & \textbf{Key limitation} \\
+\midrule
+Group-disjoint partitioning & Own corpus + grouping key & First-order leakage & Per pipeline & No & Repairs each pipeline; comparison may still be contaminated \\
+Leakage taxonomy audit (8 types) & Own pipeline description & Enumerated per-pipeline types & Per pipeline & No & No category for asymmetric exposure \\
+Causal leakage classes (4 types) & Own pipeline description & Boundary, feature, target, duplicate & Per pipeline & No & Explicitly acknowledges unenumerated pathways \\
+Lineage analysis & Documented training lineage & Corpus overlap between models & Cross-pipeline & Yes & Presumes lineage documented and truthful \\
+Contamination search & Baseline's pretraining corpus & Verbatim/near-duplicate overlap & Cross-pipeline & Yes & Presumes corpus access \\
+Black-box contamination proof & Benchmark ordering + model scores & Test-set memorisation & Cross-pipeline & Yes & Needs exchangeable benchmark ordering; language-model specific \\
+Membership inference (uncalibrated) & Model outputs & Per-example membership & Per pipeline & No & Confounded by intrinsic example difficulty \\
+Difficulty-calibrated MIA & Target + reference model outputs & Per-example membership & Per pipeline & No & Per-example scores noisy; privacy-oriented framing \\
+\textbf{GERA (this work)} & \textbf{Two prediction streams + group labels} & \textbf{Group-level asymmetric exposure} & \textbf{Per comparison} & \textbf{Yes} & \textbf{Screening statistic; no false-positive guarantee; needs a reference without differential familiarity} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\FloatBarrier
+
+\subsection{Efficient and interpretable on-device perception (C2, C3)}
+
+\subsubsection{Compact architectures and the concurrency constraint}
+
+The efficient-inference literature is large and mostly concerned with a single model's accuracy--cost frontier: depthwise-separable convolutions and channel scaling \CITE{mobilenet}, quantisation, pruning and distillation \CITE{distill} all reduce the cost of one network. The constraint operative here is different in kind. Four perception problems must be solved concurrently within one frame period on a CPU shared with the application the user is actually driving, so the binding quantity is the \emph{sum} of per-model costs plus the shared front end, and the design question is which accuracy an individual model may sacrifice in order that the sum fits.
+
+This changes what counts as a good result. A compact model is Pareto-relevant only if its accuracy penalty is sub-linear in its cost reduction by a wide margin; a model that is 34$\times$ smaller and 2.1$\times$ less accurate occupies a defensible frontier position, whereas a model that is larger \emph{and} less accurate than an available alternative is dominated and no operating point rescues it. Section 5.7 reports one instance of each outcome among the four modalities studied, and reports them separately rather than averaging them into a single verdict.
+
+A second consideration specific to CPU inference is that at these model sizes inference is bound by memory traffic rather than by arithmetic, so total resident footprint --- and in particular whether the working set stays in last-level cache --- matters disproportionately relative to nominal floating-point operation counts. Section 3.12 formalises the cost model accordingly.
+
+\subsubsection{Attribution methods and the axioms that make them auditable}
+
+Post-hoc attribution assigns to each input component a share of a model's output. Gradient-based saliency \CITE{simonyan} is inexpensive but suffers saturation; perturbation and additive-attribution methods \CITE{lundberg} are model-agnostic but expensive and sensitive to the choice of reference distribution. Integrated Gradients \CITE{ig} occupies a distinctive position for the present purpose because it satisfies \emph{completeness}: the attributions sum exactly to the difference between the model's output at the input and at a chosen baseline. Completeness is what converts an attribution plot from an illustration into an audit, since the decomposition is exact rather than indicative. Integrated Gradients is furthermore the Aumann--Shapley \CITE{aumann} continuous analogue of the Shapley value \CITE{shapley}, inheriting a cooperative-game-theoretic justification for the allocation.
+
+For the present work three further properties matter. Attribution is computed directly on the deployed TorchScript modules \CITE{torchscript}, so what is explained is what executes rather than a research-time reimplementation. Because the networks consume images and spectrograms rather than named columns, the input is partitioned into a regular grid and each region assumes the role of a feature, which makes the decomposition interpretable anatomically. And the same four views --- global summary, per-instance waterfall, similarity-ordered global explanation, and dataset-ordered global explanation --- are reported for every modality, so that the presence or absence of structure under each ordering is comparable across tasks. The dataset-ordered view in particular is a direct test of subject-invariance whenever the corpus is ordered by subject, and Section 5.5 uses it exactly so.
+
+\subsubsection{Interpretability in hands-free and assistive systems}
+
+Explainability in assistive perception remains exceptional rather than standard. Where it appears, it is typically applied to a single architecture and reported as qualitative evidence that the model attends to plausible regions, without integration with the evaluation protocol or with the decision rule that consumes the output. The framework proposed here treats attribution as a third leg of the evidence rather than as illustration: the mechanism identified for each modality must be consistent with the error structure measured for it, and where the two disagree the disagreement is reported. Section 5.2 gives an instance in which attribution independently explains an axis asymmetry that the error analysis identifies but cannot account for.
+
+\FloatBarrier
+
+\subsection{Summary and research gaps}
+
+\TABREF{2} compares representative work across the three challenges. The pattern it exposes is the same one identified in the physiological-signal literature: individual studies address at most two of the three concerns, and the concerns are treated as separable when they are not.
+
+\begin{table}[pos=htbp]
+\centering
+\caption{Representative work on hands-free interaction modalities and evaluation integrity, assessed against the three challenges. C1 = evaluation integrity under group structure \emph{and} cross-model comparison; C2 = concurrent real-time operation within a commodity CPU budget; C3 = mechanistic interpretability tied to the deployed decision rule. $\checkmark$ = addressed; $\sim$ = partially addressed; $\times$ = not addressed.}
+\label{tab:2}
+\scriptsize
+\begin{tabularx}{\textwidth}{XXXXXXccc}
+\toprule
+\textbf{Work / class} & \textbf{Domain} & \textbf{Grouping key used} & \textbf{Cross-model audit} & \textbf{Deployment cost reported} & \textbf{Interpretability} & \textbf{C1} & \textbf{C2} & \textbf{C3} \\
+\midrule
+Appearance-based gaze (MPIIGaze line) & Gaze & Participant (LOPO) & $\times$ & $\times$ & $\times$ & $\sim$ & $\times$ & $\times$ \\
+Geometric eye-aspect-ratio blink & Blink & n/a (training-free) & $\times$ & $\checkmark$ & $\checkmark$ (closed form) & $\sim$ & $\checkmark$ & $\sim$ \\
+Learned blink on cropped eyes & Blink & Sometimes subject & $\times$ & $\sim$ & $\times$ & $\sim$ & $\checkmark$ & $\times$ \\
+Landmark + PnP head pose & Head pose & n/a (training-free) & $\times$ & $\checkmark$ & $\checkmark$ (closed form) & $\sim$ & $\checkmark$ & $\sim$ \\
+Continuous-rotation head pose & Head pose & Corpus-disjoint by design & $\times$ & $\times$ & $\times$ & $\checkmark$ & $\times$ & $\times$ \\
+Small-footprint keyword spotting & Voice & Official speaker split & $\times$ & $\checkmark$ & $\times$ & $\checkmark$ & $\checkmark$ & $\times$ \\
+Production ASR engines & Voice & n/a (undocumented) & $\times$ & $\sim$ & $\times$ & $\times$ & $\sim$ & $\times$ \\
+Leakage taxonomies & Methodology & --- & $\times$ (per pipeline) & $\times$ & $\times$ & $\sim$ & $\times$ & $\times$ \\
+Lineage analysis for foundation models & Methodology & --- & $\checkmark$ (needs lineage) & $\times$ & $\times$ & $\checkmark$ & $\times$ & $\times$ \\
+Black-box contamination proof & Methodology & --- & $\checkmark$ (needs ordering) & $\times$ & $\times$ & $\checkmark$ & $\times$ & $\times$ \\
+Difficulty-calibrated MIA & Privacy & Example level & $\times$ & $\times$ & $\times$ & $\sim$ & $\times$ & $\times$ \\
+\textbf{MAPLE (this work)} & \textbf{Multimodal HCI} & \textbf{Subject / participant / identity / speaker} & \textbf{$\checkmark$ (prediction-only)} & \textbf{$\checkmark$ (deployed modules)} & \textbf{$\checkmark$ (IG, all four modalities)} & \textbf{$\checkmark$} & \textbf{$\checkmark$} & \textbf{$\checkmark$} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Three observations follow.
+
+\textbf{On C1.} Every reviewed perception study that partitions honestly does so within its own pipeline, and none audits the comparison against its baseline for exposure asymmetry. The methodological literature that does address cross-model contamination requires access --- lineage documentation or the pretraining corpus --- that is unavailable in the ordinary applied case. The gap is therefore not that the hazard is unknown but that no instrument exists for the access regime in which most comparisons are actually made.
+
+\textbf{On C2.} Deployment cost is reported inconsistently and almost never for a \emph{set} of models required to run concurrently. Where latency appears it is typically a single model on a research configuration rather than the shipped artefact, and aggregate budgets are not stated, so the question of whether a reported accuracy is achievable simultaneously with the rest of a system cannot be answered from the literature.
+
+\textbf{On C3.} Interpretability, where present, is decoupled from both the evaluation protocol and the decision rule. No reviewed work connects an attribution result to the threshold, dwell or filter that consumes the model's output, which is the connection that determines whether a mechanistic finding has an engineering consequence.
+
+MAPLE is designed to close all three simultaneously, and the remainder of the paper describes it and reports its exercise.

@@ -1,0 +1,138 @@
+%% ---------------------------------------------------------------
+%%  MAPLE: A leakage-audited and explainable framework for
+%%  real-time multimodal hands-free interaction
+%%
+%%  Mohammad Anas Shaik, Vaibhav Agarwal, Gayathri Karthick,
+%%  Sahar Ahmadzadeh -- York St John University, London
+%%
+%%  Elsevier CAS template (els-cas-templates v2.4), single column.
+%%  Target journal: Machine Learning with Applications.
+%%
+%%  Compiler: pdfLaTeX. Recompile twice so citations resolve.
+%%  Bibliography: ref.bib, style cas-model2-names.
+%%
+%%  The journal prints in two columns. To switch, change cas-sc to
+%%  cas-dc on the documentclass line below -- but the 306 equations
+%%  and the nine-column Table 2 will then need manual attention,
+%%  and Elsevier accepts single column at submission.
+%% ---------------------------------------------------------------
+%% If Overleaf reports "compile timed out", uncomment the next line.
+%% Every figure becomes an outlined box of the same size and none of
+%% the 63 PNGs is read, which is the bulk of the compile time.
+%% Pagination, citations and cross-references come out identical.
+%% Comment it out again for the version you send on.
+%\PassOptionsToPackage{draft}{graphicx}
+
+%% cas-sc loads hyperref itself, so its options must be pre-declared.
+%% Without this every float logs "destination with the same identifier
+%% has been already used" and its PDF links land on the wrong page.
+\PassOptionsToPackage{hypertexnames=false}{hyperref}
+\documentclass[a4paper,fleqn]{cas-sc}
+
+%% cas-sc.cls already loads graphicx, amsmath, amsfonts, amssymb, booktabs,
+%% array, makecell, multirow, colortbl, dcolumn, xcolor, setspace and
+%% hyperref, and defines \newdefinition, \newproof, \printcredits and the
+%% highlights environment. Only genuinely missing packages are added here.
+\usepackage[authoryear,longnamesfirst]{natbib}
+\usepackage{tabularx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+%% 63 figures and 13 tables all asking for [t] overflow LaTeX's 18-float
+%% queue -- "Too many unprocessed floats", followed by hundreds of junk
+%% errors as the queue corrupts. morefloats raises the ceiling; placeins
+%% drains the queue at each section boundary.
+\usepackage{morefloats}
+\usepackage[section]{placeins}
+
+\renewcommand{\tabularxcolumn}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+%% cross-reference helpers emitted by the converter.
+%% \CITE maps to \citep: every citation in this manuscript is parenthetical
+%% ("the MRL Eye Dataset (Fusek, 2018) holds..."), never a running author.
+\newcommand{\CITE}[1]{\citep{#1}}
+\newcommand{\EQREF}[1]{\eqref{eq:#1}}
+\newcommand{\FIGREF}[1]{Fig.~\ref{fig:#1}}
+\newcommand{\FIGRANGE}[2]{Figs.~\ref{fig:#1}--\ref{fig:#2}}
+\newcommand{\TABREF}[1]{Table~\ref{tab:#1}}
+\newcommand{\ALGREF}[1]{Algorithm~\ref{alg:#1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newdefinition{definition}{Definition}
+\newproof{proof}{Proof}
+
+\begin{document}
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
+
+\shorttitle{Leakage-audited multimodal hands-free interaction}
+\shortauthors{M. A. Shaik et al.}
+
+\title[mode = title]{MAPLE: A leakage-audited and explainable framework for real-time multimodal hands-free interaction}
+
+\author[1]{Mohammad Anas Shaik}
+\cormark[1]
+\ead{mohammad.shaik@yorksj.ac.uk}
+\credit{Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing -- original draft, Writing -- review and editing, Visualization}
+
+\author[1]{Vaibhav Agarwal}
+\credit{Supervision, Writing -- review and editing}
+
+\author[1]{Gayathri Karthick}
+\credit{Supervision, Writing -- review and editing}
+
+\author[1]{Sahar Ahmadzadeh}
+\credit{Supervision, Writing -- review and editing}
+
+\affiliation[1]{organization={Department of Computer and Data Science, York St John University},
+                addressline={Export Building, 1 Clove Crescent},
+                city={London},
+                postcode={E14 2BA},
+                country={United Kingdom}}
+
+\cortext[1]{Corresponding author}
+
+\begin{abstract}
+Hands-free interfaces that substitute gaze, blink, head pose and voice for the mouse and keyboard are limited less by their perception components than by how those components are evaluated. We show that group-disjoint partitioning, the standard remedy for identity leakage, repairs each training pipeline in isolation yet leaves the \emph{comparison} between two pipelines contaminated whenever the compared models were developed on overlapping, group-structured corpora and the evaluation sample spans at least one model's partition boundary. We formalise this condition as \textbf{asymmetric exposure}, prove that under it the reported contrast between two models is a convex mixture of a memorisation and a generalisation regime whose weight is fixed by a sampling decision rather than by the research question, and show that the established leakage taxonomies contain no category for it because they are organised per pipeline. We introduce \textbf{GERA} (Group Error-Ratio Audit), a prediction-only detector requiring neither model's training data --- only the two prediction streams and a group label per sample --- within \textbf{MAPLE}, a framework that also reports each network against the decision rule that consumes it and against attribution on the deployed module. On a four-modality hands-free system, asymmetric exposure inflated one modality's apparent accuracy by 1.905$^{\circ}$, of which 0.425$^{\circ}$--1.068$^{\circ}$ (22--56 \%) is training familiarity rather than intrinsic difficulty. GERA separates training-partition membership at AUC 0.889 (\emph{p} = 0.006) and returns \emph{I}$^{2}$ = 0.0 \% on a negative control against 99.8 \% on the contaminated comparison. Under the corrected protocol four networks totalling 7.84 MB run in 6.68 ms per frame on one CPU thread, attaining 93.67 \% (blink), 6.439$^{\circ}$ (gaze), 7.367$^{\circ}$ (head pose) and 94.53 \% (voice). Most consequentially, the correction reverses an architectural decision the uncorrected protocol had supported.
+\end{abstract}
+
+\begin{highlights}
+\item Two models can be compared unfairly even when both pipelines are split correctly.
+\item Asymmetric exposure is formalised; existing leakage taxonomies omit this category.
+\item GERA audits a comparison from predictions alone, needing no training data or lineage.
+\item Membership separates at AUC 0.889; a negative control returns I-squared of zero.
+\item Correcting the protocol reverses the architectural decision it was meant to inform.
+\end{highlights}
+
+\begin{keywords}
+Hands-free human--computer interaction \sep
+Data leakage \sep
+Model comparison \sep
+Cross-subject generalisation \sep
+Gaze estimation \sep
+Head-pose estimation \sep
+Keyword spotting \sep
+Explainable AI \sep
+Edge inference
+\end{keywords}
+
+\maketitle
+
+\input{sections/01-introduction}
+\input{sections/02-related-work}
+\input{sections/03-methodology}
+\input{sections/04-experimental}
+\input{sections/05-results}
+\input{sections/06-threats}
+\input{sections/07-conclusion}
+\input{sections/08-backmatter}
+
+\printcredits
+
+\bibliographystyle{cas-model2-names}
+\bibliography{ref}
+
+\end{document}
